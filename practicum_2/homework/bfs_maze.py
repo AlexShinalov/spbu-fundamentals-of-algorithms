@@ -1,4 +1,6 @@
 from time import perf_counter
+from collections import deque #импорт двусторонней очереди
+
 
 
 class Maze:
@@ -37,15 +39,30 @@ class Maze:
 
 
 def solve(maze: Maze) -> None:
-    path = ""  # solution as a string made of "L", "R", "U", "D"
+    path = ""
+    queue = [(0, maze.start_j, "")]
+    visited = set()
+    while queue:
+        i, j, path = queue.pop(0)
+        if maze.list_view[i][j] == "X":
+            print(f"Found: {path}")
+            maze.print(path)
+            return
 
-    ##########################
-    ### PUT YOUR CODE HERE ###
-    ##########################
+        if (i, j) in visited:
+            continue
+        visited.add((i, j))
 
-    print(f"Found: {path}")
-    maze.print(path)
-
+        if i > 0 and maze.list_view[i - 1][j] != "#":
+            queue.append((i - 1, j, path + "U"))
+        if i < len(maze.list_view) - 1 and maze.list_view[i + 1][j] != "#":
+            queue.append((i + 1, j, path + "D"))
+        if j > 0 and maze.list_view[i][j - 1] != "#":
+            queue.append((i, j - 1, path + "L"))
+        if j < len(maze.list_view[0]) - 1 and maze.list_view[i][j + 1] != "#":
+            queue.append((i, j + 1, path + "R"))
+        #print(f"Found: {path}")
+       #maze.print(path)
 
 def _shift_coordinate(i: int, j: int, move: str) -> tuple[int, int]:
     if move == "L":
@@ -60,7 +77,7 @@ def _shift_coordinate(i: int, j: int, move: str) -> tuple[int, int]:
 
 
 if __name__ == "__main__":
-    maze = Maze.from_file("practicum_2/homework/maze_2.txt")
+    maze = Maze.from_file("./maze_2.txt")
     t_start = perf_counter()
     solve(maze)
     t_end = perf_counter()
